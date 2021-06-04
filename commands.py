@@ -1,5 +1,5 @@
 import random
-
+import json
 from helper import find_item, show_room
 import states
 
@@ -242,6 +242,22 @@ def cmd_west(context):
     _go(context, 'west')
 
 
+def cmd_save(context):
+    with open('save.json', 'w+', encoding='utf-8') as file:
+        json.dump(context, file, ensure_ascii=False)
+
+    print('Hra uspesne ulozena.')
+
+
+def cmd_load(context):
+    with open('save.json', 'r', encoding='utf-8') as file:
+        context.update(json.load(file))
+
+    print('Ulozena hra bola uspesne nacitana.')
+    room = context['room']
+    show_room(room)
+
+
 commands = [
     {
         'description': 'Ukončí rozohratú hru.',
@@ -319,5 +335,17 @@ commands = [
         'description': 'Presunie sa do miestnosti na západ.',
         'aliases': ('ZAPAD', 'WEST', 'Z'),
         'exec': cmd_west
+    },
+
+    {
+        'description': 'Ulozi rozohratu hru.',
+        'aliases': ('ULOZIT', 'SAVE'),
+        'exec': cmd_save
+    },
+
+    {
+        'description': 'Nacita ulozenu hru.',
+        'aliases': ('NACITAT', 'LOAD'),
+        'exec': cmd_load
     }
 ]
