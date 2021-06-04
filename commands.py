@@ -1,3 +1,4 @@
+import json
 import random
 import json
 from helper import find_item, show_room
@@ -92,13 +93,6 @@ def cmd_inventory(context):
     print('V batohu máš:')
     for item in context['inventory']:
         print(f'\t{item["name"].lower()}')
-
-
-def cmd_commands(context):
-    print('Príkazy:')
-
-    for cmd in context['commands']:
-        print(f' {cmd["aliases"][0]} - {cmd["description"]}')
 
 
 def cmd_look_around(context):
@@ -244,21 +238,31 @@ def cmd_west(context):
 
 def cmd_save(context):
     with open('save.json', 'w+', encoding='utf-8') as file:
-        json.dump(context, file, ensure_ascii=False)
-
-    print('Hra uspesne ulozena.')
+        json.dump(context, file, ensure_ascii=False, indent=4)
+    print('Pozícia sa úspešne uložila.')
 
 
 def cmd_load(context):
     with open('save.json', 'r', encoding='utf-8') as file:
         context.update(json.load(file))
+        room = context['room']
+        show_room(context['world'][room])
+        print('Pozícia bola úspešne načítaná.')
 
-    print('Ulozena hra bola uspesne nacitana.')
-    room = context['room']
-    show_room(room)
+
+def cmd_commands(context):
+    print('Príkazy:')
+    for cmd in commands:
+        print(f' {cmd["aliases"][0]} - {cmd["description"]}')
 
 
 commands = [
+    {
+        'description': 'Zobrazí zoznam príkazov dostupných v hre.',
+        'aliases': ('PRIKAZY', 'COMMANDS', 'HELP', 'POMOC', '?'),
+        'exec': cmd_commands
+    },
+
     {
         'description': 'Ukončí rozohratú hru.',
         'aliases': ('KONIEC', 'QUIT', 'EXIT', 'Q', 'BYE'),
@@ -275,12 +279,6 @@ commands = [
         'description': 'Zobrazí informácie o zvolenom predmete.',
         'aliases': ('PRESKUMAJ', 'INSPECT'),
         'exec': cmd_inspect
-    },
-
-    {
-        'description': 'Zobrazí zoznam príkazov dostupných v hre.',
-        'aliases': ('PRIKAZY', 'COMMANDS', 'HELP', 'POMOC', '?'),
-        'exec': cmd_commands
     },
 
     {
@@ -338,14 +336,14 @@ commands = [
     },
 
     {
-        'description': 'Ulozi rozohratu hru.',
-        'aliases': ('ULOZIT', 'SAVE'),
+        'description': 'Uloží stav hry na disk.',
+        'aliases': ('ULOZ', 'SAVE', 'ULOZIT'),
         'exec': cmd_save
     },
 
     {
-        'description': 'Nacita ulozenu hru.',
-        'aliases': ('NACITAT', 'LOAD'),
+        'description': 'Načíta stav hry z disku.',
+        'aliases': ('NACITAT', 'LOAD', 'NAHRAT', 'NACITAJ', 'NAHRAJ'),
         'exec': cmd_load
-    }
+    },
 ]
